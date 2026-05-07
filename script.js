@@ -4,10 +4,10 @@ const initialTextareaHeight = textarea.scrollHeight;
 
 //Botão para abrir o chat
 async function createBotReplay(content) {
-  const response = await fetch("http://localhost:3000/chat", {
+  const response = await fetch("/chat", {
     method: "POST",
     headers: {
-      "content-Type": "application/json",
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({ message: content }),
   });
@@ -53,7 +53,7 @@ function handleTogglerChat() {
 
 // Função que contro o Enter para enviar mensagem
 function handleChatOnKeyDown(event) {
-  if (event.key === "Enter" && !event.shiftkey) {
+  if (event.key === "Enter" && !event.shiftKey) {
     event.preventDefault();
     handleChat();
   }
