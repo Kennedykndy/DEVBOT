@@ -13,7 +13,7 @@ app.use(express.static(path.join(__dirname)));
 
 // Página inicial
 app.get("/", (req, res) => {
-  res.send("DEVBOT online 🚀");
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 // Endpoint para chat
