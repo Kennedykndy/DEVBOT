@@ -2,12 +2,12 @@ const textarea = document.querySelector("textarea");
 
 const initialTextareaHeight = textarea.scrollHeight;
 
-//Botão para abrir o chat
+// Função para obter resposta do backend
 async function createBotReplay(content) {
   const response = await fetch("http://localhost:3000/chat", {
     method: "POST",
     headers: {
-      "content-Type": "application/json",
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({ message: content }),
   });
@@ -21,81 +21,95 @@ async function createBotReplay(content) {
   }
 }
 
-// Função para criar um elemento de mensagem no chat
+// Função para criar mensagens
 function createChatMessage(message, type) {
   const li = document.createElement("li");
+
   li.classList.add("message", type);
 
   const p = document.createElement("p");
 
+  // Ícone do bot
   if (type === "bot") {
     const i = document.createElement("i");
+
     i.classList.add("fa-solid", "fa-robot", "fa-xl");
+
     li.appendChild(i);
   }
 
   p.textContent = message;
+
   li.appendChild(p);
 
   return li;
 }
 
-// Função para lidar com o envir da mensagem do usuário e a
-//resposta do bot
-
+// Fechar chat
 function handleCloseChat() {
   document.body.classList.remove("open-chat");
 }
 
+// Abrir / fechar chat
 function handleTogglerChat() {
   document.body.classList.toggle("open-chat");
 }
 
-// Função que contro o Enter para enviar mensagem
+// Enter para enviar mensagem
 function handleChatOnKeyDown(event) {
-  if (event.key === "Enter" && !event.shiftkey) {
+  if (event.key === "Enter" && !event.shiftKey) {
     event.preventDefault();
+
     handleChat();
   }
 }
 
-//Função para lidar com o redimensionamento automático do textarea
+// Auto resize textarea
 function handleAutoSize() {
   textarea.style.height = `${initialTextareaHeight}px`;
+
   textarea.style.height = `${textarea.scrollHeight}px`;
 }
 
-//Adicionando os events listeners aos elementos
+// Função principal do chat
 async function handleChat() {
   const textareaValue = textarea.value.trim();
 
   if (!textareaValue) return;
 
   const main = document.querySelector("main");
+
   const messageHistory = document.querySelector("ul");
 
+  // Mensagem do usuário
   const userMessage = createChatMessage(textareaValue, "user");
 
   messageHistory.appendChild(userMessage);
+
   main.scrollTo(0, main.scrollHeight);
 
+  // Limpa textarea
   textarea.value = "";
 
+  textarea.style.height = `${initialTextareaHeight}px`;
+
+  // Mensagem temporária do bot
   const botMessage = createChatMessage("Digitando...", "bot");
 
-  setTimeout(() => {
-    messageHistory.appendChild(botMessage);
-    main.scrollTo(0, main.scrollHeight);
-  }, 500);
+  messageHistory.appendChild(botMessage);
+
+  main.scrollTo(0, main.scrollHeight);
 
   try {
     const botReplay = await createBotReplay(textareaValue);
 
     botMessage.querySelector("p").textContent = botReplay;
-    messageHistory.scrollTo(0, messageHistory.scrollHeight);
+
+    main.scrollTo(0, main.scrollHeight);
   } catch (error) {
     botMessage.querySelector("p").textContent =
       "Ops! Algo deu errado. Por favor tente novamente.";
+
     botMessage.querySelector("p").classList.add("error");
   }
 }
